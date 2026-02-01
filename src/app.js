@@ -1,27 +1,25 @@
 const express = require("express");
 const app = express();
+const { adminAuth , userAuth } = require("../middleware/auth");
 
-app.get("/admin/getAlldata", (req, res, next)=>{
-    const token= "xsyz";
-    const isAdminAuthorized = token==="xyz";
 
-    if(isAdminAuthorized){
+app.use("/admin",adminAuth);
+
+app.get("/admin/getAlldata", (req, res)=>{
+   
         res.send("all data send");
-    } else {
-        res.status(401).send("unauthorized reqest");
-    }
+    
 });
 
-app.delete("/admin/deletedData", (req, res, next)=>{
-    const token= "xyz";
-    const isAdminAuthorized = token==="xyz";
+app.use("/user",userAuth);
 
-    if(isAdminAuthorized){
-        res.send("all Data is deleteded success fully");
-    } else {
-        res.status(401).send("unauthorized reqest");
-    }
+app.get("/user/userdata", (req, res)=>{
+   
+        res.send("all data send");
+    
 });
+
+
 
 
 app.listen(7777, ()=>{
