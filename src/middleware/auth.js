@@ -1,5 +1,5 @@
 const adminAuth =  (req, res , next)=>{
-    console.log("admin auth gatting checked!!!");
+    console.log("admin auth gateing checked!!!");
     const token= "xyz";
     const isAdminAuthorized = token==="xyz";
 
