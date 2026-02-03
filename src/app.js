@@ -18,6 +18,86 @@ app.post("/signup", async (req, res)=>{
     }
 });
 
+//get only one user by email
+    app.get("/user", async (req, res)=>{
+        const userEmail = req.body.email;
+        try{
+            const users = await User.find({email: userEmail});
+            if(users.length===0){
+                res.status(404).send("user not found");
+            }else{
+                res.send(users);
+            }
+        
+        }catch(err){
+                res.status(500).send("internal server error");
+            }
+        
+    });
+
+
+    //feed API - get/feed- get all the users from database
+
+    app.get("/feed", async (req, res)=>{
+       
+        try{
+            const allUsers = await User.find({});
+            if(allUsers.length===0){
+                res.status(404).send("no users found");
+            }else{
+                res.send(allUsers);
+            }
+        }catch(err){
+            res.status(500).send("internal server error");
+        }
+    });
+
+
+    app.delete("/delete", async (req, res)=>{
+        const userId = req.body.userId;
+        try{
+            const user = await User.findByIdAndDelete(userId);
+            if(!user){
+                res.status(404).send("user not found");
+            }else{
+                res.send("user deleted successfully");
+            }
+        }catch(err){
+            res.status(500).send("internal server error");
+        }
+    });
+    
+    //delete a user by id
+   app.delete("/user/:id", async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const user = await User.findByIdAndDelete(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// update data of user from database by id
+
+app.patch("/user", async (req, res)=>{
+    const userId = req.body.userId;
+    const updateData = req.body;
+    try{
+       await User.findByIdAndUpdate({_id : userId}, updateData);
+        res.send("user data updated successfully");
+    }catch(err){
+        res.status(400).send("internal server error");
+    }
+});
+
+
 // Connect to the database
 connectDB()
 .then(() => {
