@@ -90,7 +90,10 @@ app.patch("/user", async (req, res)=>{
     const userId = req.body.userId;
     const updateData = req.body;
     try{
-       await User.findByIdAndUpdate({_id : userId}, updateData);
+      const user = await User.findByIdAndUpdate({_id : userId}, updateData,{
+        returnDocument : "after",
+       });
+       console.log(user);
         res.send("user data updated successfully");
     }catch(err){
         res.status(400).send("internal server error");
