@@ -5,18 +5,16 @@ const User = require("./models/user");
 
         app.use(express.json());
 //create a post api for instert data in database for signup
-app.post("/signup", async (req, res)=>{
-
-    const user = new User (req.body);
-    try{
+app.post("/signup", async (req, res) => {
+  try {
+    const user = new User(req.body);
     await user.save();
-    res.send("user signed up successfully");
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).send("internal server error");
-    }
+    res.status(201).json({ message: "User signed up successfully" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
+
 
 //get only one user by email
     app.get("/user", async (req, res)=>{
@@ -41,7 +39,7 @@ app.post("/signup", async (req, res)=>{
     app.get("/feed", async (req, res)=>{
        
         try{
-            const allUsers = await User.find({});
+            const allUsers = await User.find().select("-password");
             if(allUsers.length===0){
                 res.status(404).send("no users found");
             }else{
@@ -53,19 +51,19 @@ app.post("/signup", async (req, res)=>{
     });
 
 
-    app.delete("/delete", async (req, res)=>{
-        const userId = req.body.userId;
-        try{
-            const user = await User.findByIdAndDelete(userId);
-            if(!user){
-                res.status(404).send("user not found");
-            }else{
-                res.send("user deleted successfully");
-            }
-        }catch(err){
-            res.status(500).send("internal server error");
-        }
-    });
+    // app.delete("/delete", async (req, res)=>{
+    //     const userId = req.body.userId;
+    //     try{
+    //         const user = await User.findByIdAndDelete(userId);
+    //         if(!user){
+    //             res.status(404).send("user not found");
+    //         }else{
+    //             res.send("user deleted successfully");
+    //         }
+    //     }catch(err){  
+    //         res.status(500).send("internal server error");
+    //     }
+    // });
     
     //delete a user by id
    app.delete("/user/:id", async (req, res) => {
@@ -92,6 +90,7 @@ app.patch("/user", async (req, res)=>{
     try{
       const user = await User.findByIdAndUpdate({_id : userId}, updateData,{
         returnDocument : "after",
+        runValidators : true,
        });
        console.log(user);
         res.send("user data updated successfully");
