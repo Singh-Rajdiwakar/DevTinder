@@ -84,18 +84,28 @@ app.post("/signup", async (req, res) => {
 
 // update data of user from database by id
 
-app.patch("/user", async (req, res)=>{
-    const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res)=>{
+    const userId = req.params?.userId;
     const updateData = req.body;
     try{
-      const user = await User.findByIdAndUpdate({_id : userId}, updateData,{
+        const ALLOWED_UPDATE=["firstName", "password","about","skills", "age", "gender", "phoneNumber", "photourl"];
+        const requestedUpdate = Object.keys(updateData);
+        const isValidUpdate = requestedUpdate.every((update) => ALLOWED_UPDATE.includes(update));
+        if(!isValidUpdate){
+            return res.status(500).send("invalid update");
+        }
+        if (updateData.skills && updateData.skills.length > 5) {
+    return res.status(500).send("skills should not be more than 5");
+}
+          const user = await User.findByIdAndUpdate(userId, updateData,{
         returnDocument : "after",
+        new : true,
         runValidators : true,
        });
        console.log(user);
         res.send("user data updated successfully");
     }catch(err){
-        res.status(400).send("internal server error");
+        res.status(500).send("internal server error");
     }
 });
 
